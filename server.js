@@ -1,4 +1,7 @@
 const express = require('express');
+
+require('./src/db');
+
 const app = express();
 
 app.use(express.json());
