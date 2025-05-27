@@ -2,6 +2,30 @@ const express = require('express');
 const router = express.Router();
 const connection = require('../db');
 
+
+//rota de Cadastro voluntario
+router.post('/cadastro', (req, res) => {
+  const { nome, email, senha } = req.body
+
+  if (!nome || !email || !senha) {
+    return res.status(400).json({ mensagem: 'Todos os campos são obrigatórios.' })
+  }
+
+  const query = 'INSERT INTO usuarios (nome, email, senha, tipo_usuario) VALUES (?, ?, ?, ?)'
+  const valores = [nome, email, senha, 'voluntario'];
+
+  connection.query(query, valores, (erro, resultado) => {
+    if (erro) {
+      if (erro.code === 'ER_DUP_ENTRY') {
+        return res.status(400).json({ mensagem: 'Email já está cadastrado.' })
+      }
+      return res.status(500).json({ mensagem: 'Erro ao cadastrar usuário.', erro })
+    }
+
+    res.status(201).json({ mensagem: 'Cadastro realizado com sucesso!' })
+  });
+});
+
 // Rota de login admin ou voluntario
 router.post('/login', (req, res) => {
     const { email, senha } = req.body;
