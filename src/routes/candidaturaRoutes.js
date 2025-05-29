@@ -52,4 +52,37 @@ router.get('/candidaturas/:usuario_id', (req, res) => {
   });
 });
 
+// Rota para cancelar candidatura
+router.delete('/candidaturas/:id', (req, res) => {
+  const candidaturaId = req.params.id
+  const { usuario_id } = req.body
+
+  if (!usuario_id) {
+    return res.status(400).json({ erro: 'Usuário não autenticado.' })
+  }
+
+  const verificaQuery = 'SELECT * FROM candidaturas WHERE id = ? AND usuario_id = ?'
+  connection.query(verificaQuery, [candidaturaId, usuario_id], (err, results) => {
+    if (err) {
+      console.error('Erro ao verificar candidatura:', err)
+      return res.status(500).json({ erro: 'Erro interno ao verificar candidatura.' })
+    }
+
+    if (results.length === 0) {
+      return res.status(403).json({ erro: 'Candidatura não encontrada ou não pertence a este usuário.' })
+    }
+
+    const deleteQuery = 'DELETE FROM candidaturas WHERE id = ?'
+    connection.query(deleteQuery, [candidaturaId], (err, result) => {
+      if (err) {
+        console.error('Erro ao cancelar candidatura:', err)
+        return res.status(500).json({ erro: 'Erro ao cancelar a candidatura.' })
+      }
+
+      res.status(200).json({ mensagem: 'Candidatura cancelada com sucesso.' })
+    });
+  });
+});
+
+
 module.exports = router
