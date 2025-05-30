@@ -35,4 +35,23 @@ router.get('/vagas', (req, res) => {
     })
 })
 
+// Rota para excluir uma vaga pelo ID
+router.delete('/vagas/:id', (req, res) => {
+    const { id } = req.params
+
+    const query = 'DELETE FROM vagas WHERE id = ?'
+
+    connection.query(query, [id], (erro, resultado) => {
+        if (erro) {
+            return res.status(500).json({ mensagem: 'Erro ao excluir vaga.', erro })
+        }
+
+        if (resultado.affectedRows === 0) {
+            return res.status(404).json({ mensagem: 'Vaga não encontrada.' })
+        }
+
+        res.status(200).json({ mensagem: 'Vaga excluída com sucesso.' })
+    });
+});
+
 module.exports = router
