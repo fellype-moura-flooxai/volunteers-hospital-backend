@@ -60,5 +60,28 @@ router.delete('/vagas/:id', (req, res) => {
     })
 })
 
+// Rota para buscar uma vaga por ID
+router.get('/vagas/:id', (req, res) => {
+    const { id } = req.params;
+    const query = 'SELECT * FROM vagas WHERE id = ?';
+    connection.query(query, [id], (erro, resultados) => {
+        if (erro) return res.status(500).json({ mensagem: 'Erro ao buscar vaga.', erro });
+        if (resultados.length === 0) return res.status(404).json({ mensagem: 'Vaga não encontrada.' });
+        res.status(200).json(resultados[0]);
+    });
+});
+
+// Rota para atualizar vaga
+router.put('/vagas/:id', (req, res) => {
+    const { id } = req.params;
+    const { titulo, descricao, requisitos, data } = req.body;
+    const query = 'UPDATE vagas SET titulo = ?, descricao = ?, requisitos = ?, data = ? WHERE id = ?'
+    connection.query(query, [titulo, descricao, requisitos, data, id], (erro, resultado) => {
+        if (erro) return res.status(500).json({ mensagem: 'Erro ao atualizar vaga.', erro })
+        res.status(200).json({ mensagem: 'Vaga atualizada com sucesso!' })
+    })
+})
+
+
 
 module.exports = router
