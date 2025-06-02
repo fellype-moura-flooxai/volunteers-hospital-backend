@@ -82,6 +82,31 @@ router.put('/vagas/:id', (req, res) => {
     })
 })
 
+// Rota para listar candidaturas de uma vaga específica
+router.get('/vagas/:id/candidaturas', (req, res) => {
+    const { id } = req.params;
+
+    const query = `
+        SELECT 
+            c.id AS candidatura_id,
+            c.status,
+            c.data_candidatura,
+            u.id AS usuario_id,
+            u.nome,
+            u.email
+        FROM candidaturas c
+        JOIN usuarios u ON c.usuario_id = u.id
+        WHERE c.vaga_id = ?
+    `;
+
+    connection.query(query, [id], (erro, resultados) => {
+        if (erro) {
+            return res.status(500).json({ mensagem: 'Erro ao buscar candidaturas.', erro });
+        }
+
+        res.status(200).json(resultados)
+    })
+})
 
 
 module.exports = router
