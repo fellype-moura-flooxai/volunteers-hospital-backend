@@ -84,5 +84,30 @@ router.delete('/candidaturas/:id', (req, res) => {
   });
 });
 
+// Rota para atualizar o status de uma candidatura
+router.put('/candidaturas/:id', (req, res) => {
+  const { id } = req.params
+  const { status } = req.body
+
+  if (!status) {
+    return res.status(400).json({ erro: 'Status é obrigatório.' })
+  }
+
+  const query = 'UPDATE candidaturas SET status = ? WHERE id = ?'
+  connection.query(query, [status, id], (err, resultado) => {
+    if (err) {
+      console.error('Erro ao atualizar status:', err);
+      return res.status(500).json({ erro: 'Erro ao atualizar status.' })
+    }
+
+    if (resultado.affectedRows === 0) {
+      return res.status(404).json({ erro: 'Candidatura não encontrada.' })
+    }
+
+    res.status(200).json({ mensagem: 'Status atualizado com sucesso.' })
+  })
+})
+
+
 
 module.exports = router
