@@ -112,7 +112,7 @@ router.put('/candidaturas/:id', (req, res) => {
 router.put('/candidaturas/:id/concluir', (req, res) => {
   const { id } = req.params
 
-  const verificarQuery = 'SELECT * FROM candidaturas WHERE id = ?'
+  const verificarQuery = 'SELECT id, usuario_id, status FROM candidaturas WHERE id = ?'
   connection.query(verificarQuery, [id], (erro, resultados) => {
     if (erro) {
       console.error('Erro ao verificar candidatura:', erro)
@@ -124,11 +124,11 @@ router.put('/candidaturas/:id/concluir', (req, res) => {
     }
 
     const candidatura = resultados[0]
+
     if (candidatura.status === 'concluida') {
       return res.status(400).json({ erro: 'Candidatura já foi concluída.' })
     }
 
-    // Marca como concluída 
     const marcarConcluidaQuery = 'UPDATE candidaturas SET status = "concluida" WHERE id = ?'
     connection.query(marcarConcluidaQuery, [id], (erroAtualizar) => {
       if (erroAtualizar) {
@@ -153,7 +153,5 @@ router.put('/candidaturas/:id/concluir', (req, res) => {
     })
   })
 })
-
-
 
 module.exports = router
