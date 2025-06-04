@@ -112,7 +112,6 @@ router.put('/candidaturas/:id', (req, res) => {
 router.put('/candidaturas/:id/concluir', (req, res) => {
   const { id } = req.params
 
-  // Primeiro, verifica se a candidatura existe e se já foi concluída
   const verificarQuery = 'SELECT * FROM candidaturas WHERE id = ?'
   connection.query(verificarQuery, [id], (erro, resultados) => {
     if (erro) {
@@ -125,19 +124,18 @@ router.put('/candidaturas/:id/concluir', (req, res) => {
     }
 
     const candidatura = resultados[0]
-    if (candidatura.concluida) {
+    if (candidatura.status === 'concluida') {
       return res.status(400).json({ erro: 'Candidatura já foi concluída.' })
     }
 
-    // Marca como concluída
-    const marcarConcluidaQuery = 'UPDATE candidaturas SET concluida = true WHERE id = ?'
+    // Marca como concluída 
+    const marcarConcluidaQuery = 'UPDATE candidaturas SET status = "concluida" WHERE id = ?'
     connection.query(marcarConcluidaQuery, [id], (erroAtualizar) => {
       if (erroAtualizar) {
         console.error('Erro ao marcar como concluída:', erroAtualizar)
         return res.status(500).json({ erro: 'Erro ao concluir candidatura.' })
       }
 
-      // Adiciona pontos 10
       const pontos = 10
       const atualizarPontuacao = `
         INSERT INTO pontuacoes (usuario_id, pontos)
@@ -146,7 +144,7 @@ router.put('/candidaturas/:id/concluir', (req, res) => {
 
       connection.query(atualizarPontuacao, [candidatura.usuario_id, pontos], (erroPontuacao) => {
         if (erroPontuacao) {
-          console.error('Erro ao adicionar pontuação:', erroPontuacao);
+          console.error('Erro ao adicionar pontuação:', erroPontuacao)
           return res.status(500).json({ erro: 'Erro ao adicionar pontuação.' })
         }
 
