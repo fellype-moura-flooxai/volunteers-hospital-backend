@@ -11,8 +11,10 @@ router.post('/candidaturas', (req, res) => {
     return res.status(400).json({ erro: 'Dados incompletos.' })
   }
 
-  const query = 'INSERT INTO candidaturas (usuario_id, vaga_id, status) VALUES (?, ?, ?)'
-  connection.query(query, [usuario_id, vaga_id, status || 'pendente'], (err, results) => {
+  const hoje = new Date().toISOString().split('T')[0]
+
+  const query = 'INSERT INTO candidaturas (usuario_id, vaga_id, status, data_candidatura) VALUES (?, ?, ?, ?)'
+  connection.query(query, [usuario_id, vaga_id, status || 'pendente', hoje], (err, results) => {
     if (err) {
       if (err.code === 'ER_DUP_ENTRY') {
         return res.status(400).json({ erro: 'Você já se candidatou a esta vaga.' })
