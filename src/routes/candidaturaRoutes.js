@@ -36,6 +36,7 @@ router.get('/candidaturas/:usuario_id', (req, res) => {
       v.titulo,
       v.data,
       c.status
+      c.concluida
     FROM candidaturas c
     JOIN vagas v ON c.vaga_id = v.id
     WHERE c.usuario_id = ?
