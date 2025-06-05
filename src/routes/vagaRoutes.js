@@ -91,6 +91,7 @@ router.get('/vagas/:id/candidaturas', (req, res) => {
             c.id AS candidatura_id,
             c.status,
             c.data_candidatura,
+            c.concluida,
             u.id AS usuario_id,
             u.nome,
             u.email
